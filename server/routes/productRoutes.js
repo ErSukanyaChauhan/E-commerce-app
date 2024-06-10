@@ -8,7 +8,7 @@ const router = express.Router();
 router.get('/seller', authCheck, getProductBySellerId);
 
 router.get('/',
-    authCheck,
+//    authCheck,
     //roleGaurd(["seller", "admin"]),
     getProducts);
 
@@ -16,7 +16,10 @@ router.get('/',
 router.get('/:productId', getProductById);
 
 //update product by id
-router.put('/:productId', upload.single("image"), updateProductById);
+router.put('/:productId', 
+authCheck,
+//upload.single("image"),
+updateProductById);
 
 router.post('/',
     authCheck,

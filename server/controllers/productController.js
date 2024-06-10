@@ -31,7 +31,8 @@ const getProductById = async (req, res) => {
 const updateProductById = async (req, res) => {
     try {
         console.log("data>>", req.body);
-        let originalData = JSON.parse(req.body.data);
+        //let originalData = JSON.parse(req.body.data);
+        let originalData = req.body;
         let newData;
         if (req.file) {
             newData = { ...originalData, imageUrl: req.file.filename };
@@ -47,7 +48,7 @@ const updateProductById = async (req, res) => {
         if (!product) {
             return res.status(404).json({ error: "Product not found" });
         }
-        res.status(200).json(product);
+        res.status(200).json({data:product,message:"Updated Successfully",status:200});
 
     } catch (error) {
         console.error(error);
