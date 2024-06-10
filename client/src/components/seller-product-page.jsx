@@ -75,7 +75,7 @@ import {
     };
   
     const handleDelete = async (productId) => {
-      // if (confirm("Are you sure you want to proceed?")) {
+      if (confirm("Are you sure you want to proceed?")) {
         // user clicked OK
         console.log(`Delete product with ID: ${productId}`);
   
@@ -87,12 +87,11 @@ import {
           });
           fetchProductsData();
         }
-        fetchProductsData();
-      // } else {
-      //   // user clicked Cancel
+      } else {
+        // user clicked Cancel
   
-      //   console.log("ok");
-      // }
+        console.log("ok");
+      }
       // Implement the delete functionality
   
       console.log(response);

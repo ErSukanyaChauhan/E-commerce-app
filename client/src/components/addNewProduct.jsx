@@ -8,12 +8,12 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import Header from "./header"
 import SellerProductsPage from "./seller-product-page"
-import react from "react";
+import react, { useEffect } from "react";
 import axios from "axios";
 import { yupResolver } from "@hookform/resolverS/yup";
 import Cookies from "js-cookie";
 import { BACKEND_URL } from "../constants/routes";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast, { Toaster } from 'react-hot-toast';
 
 const schema = yup.object().shape({
@@ -36,19 +36,40 @@ const schema = yup.object().shape({
 })
 
 const SellerAddProductPage = ({ history }) => {
+    const { productId } = useParams();
+
     const navigate = useNavigate();
-     const {
+
+    const fetchProductbyId = async (proId) => {
+        let response = await axios.get(`${BACKEND_URL}/product/${proId}`);
+
+        let productData = response.data;
+        setValue("name", productData.name);
+        setValue("category", productData.category);
+        setValue("description", productData.description);
+        //setValue("color",productData.color);
+        setValue("price", productData.price);
+        setValue("stock", productData.stock);
+        setValue("color", productData.attributes[0].value);
+        setValue("size", productData.attributes[1].value);
+
+    }
+    useEffect(() => {
+        if (productId) {
+            fetchProductbyId(productId);
+        }
+    }, [productId])
+    const {
         handleSubmit,
         control,
+        setValue,
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
     });
-    console.log("The error", errors);
 
     const onSubmit = async (data) => {
         try {
-            console.log("the data", data);
             const token = Cookies.get("authToken");
             const formData = new FormData();
 
@@ -60,40 +81,51 @@ const SellerAddProductPage = ({ history }) => {
             // formData.append("color", data.color);
             // formData.append("size", data.size);
             // formData.append("image", data.image[0]);
+            const attributes = [
+                { name: "Color", value: data.color },
+                { name: "Size", value: data.size }
+            ]
             const dataObj = {
                 name: data.name,
                 description: data.description,
                 price: data.price,
                 stock: data.stock,
                 category: data.category,
-                color: data.color,
-                size: data.size,
+                attributes: [
+                    { name: attributes[0].name, value: attributes[0].value },
+                    { name: attributes[1].name, value: attributes[1].value }
+                ],
 
             };
             //const newObj = {data:JSON.stringify(dataObj)};
-
-            let response = await axios.post(`${BACKEND_URL}/product`,
-                { data: dataObj }, {
+            let response;
+            let config = {
                 headers: {
-                    Authorization: token,
-                    // "content-Type":"multipart/form-data"
-                },
+                    Authorization: token
+                }
+            };
+            if (productId) {
+                response = await axios.put(`${BACKEND_URL}/product/${productId}`, dataObj, config)
+            } else {
+                response = await axios.post(
+                    `${BACKEND_URL}/product`,
+                    { data: dataObj }, config
+                );
+
             }
-            );
-            if(response.status == 200){
-                toast.success(response.data.message,{
-                    position:"top-right",
+            if (response.status == 200) {
+                toast.success(response.data.message, {
+                    position: "top-right",
                 });
-                setTimeout(()=>{
+                setTimeout(() => {
                     navigate("/seller/product");
-                },1000);
-            }else{
-                toast.error("Not Worked",{
-                    position:"top-right",
+                }, 1000);
+            } else {
+                toast.error("Not Worked", {
+                    position: "top-right",
                 });
             }
 
-            console.log("The response", response);
         } catch (error) {
             console.error("Error Adding Product", error)
         }
@@ -106,7 +138,12 @@ const SellerAddProductPage = ({ history }) => {
             <Header />
             <Container>
                 <Typography variant="h5" gutterBottom>
-                    Add New Product
+
+                    {productId ? (
+                        "Edit Product"
+                    ) : (
+                        "Add New Product"
+                    )}
                 </Typography>
 
                 {/* "handleSubmit" will validate your inputs before invoking "onSubmit" */}
@@ -238,14 +275,21 @@ const SellerAddProductPage = ({ history }) => {
                         </Grid>
                         {/* Submit button*/}
                         <Grid item xs={12} >
-                            <Button variant="contained" color="primary" type="submit">
-                                ADD Product
-                            </Button>
-                            
+                            {productId ? (
+                                <Button variant="contained" color="primary" type="submit">
+                                    Edit Product
+                                </Button>
+                            ) : (
+                                <Button variant="contained" color="primary" type="submit">
+                                    ADD Product
+                                </Button>
+                            )}
+
+
                         </Grid>
                     </Grid>
                 </form>
-                <Toaster/>
+                <Toaster />
             </Container>
 
         </>

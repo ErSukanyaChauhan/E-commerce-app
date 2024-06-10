@@ -8,29 +8,27 @@ import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
-//import { setProducts } from "../store/actions/productsActions";
 
 // import { Link } from "react-router-dom";
 
-// import { useDispatch, useSelector } from "react-redux";
-
-// import { setProducts } from "../store/actions/productsActions";
+import { useDispatch, useSelector } from "react-redux";
+import { setProducts } from "../store/actions/productsActions";
 
 export default function CardComponent({ product }) {
-  // const dispatch = useDispatch();
-  // const productsInCart = useSelector((state) => state.cart.products);
+  const dispatch = useDispatch();
+  const productsInCart = useSelector((state) => state.cart.products);
   // // console.log("🚀 ~ CardComponent ~ productsInCart:", productsInCart);
 
   function isItemInCart() {
     return false;
     // console.log(productsInCart.some((oneObj) => oneObj._id == product._id));
-   // return productsInCart.some((oneObj) => oneObj._id == product._id);
+    // return productsInCart.some((oneObj) => oneObj._id == product._id);
   }
 
-  // const handleAddToCart = () => {
-  //   console.log("the product", product);
-  //   dispatch(setProducts(product));
-  // };
+  const handleAddToCart = () => {
+    console.log("the product", product);
+    dispatch(setProducts(product));
+  };
   return (
     <Card sx={{ maxWidth: 345 }}>
       {/* <Link
@@ -62,9 +60,9 @@ export default function CardComponent({ product }) {
             Already Added
           </Button>
         ) : (
-          <Button 
-          // onClick={handleAddToCart} 
-          size="small">
+          <Button
+            onClick={handleAddToCart}
+            size="small">
             Add To Cart
           </Button>
         )}
